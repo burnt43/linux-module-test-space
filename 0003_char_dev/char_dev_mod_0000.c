@@ -15,7 +15,7 @@ static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
 #define BUF_LEN     80
 
 static int major;
-static int device_open = 0;
+static int device_open_count = 0;
 
 static char msg[BUF_LEN];
 static char *msg_ptr;
@@ -39,4 +39,46 @@ int init_module(void) {
   printk( KERN_INFO "mknod /dev/%s c %d 0\n", DEVICE_NAME, major );
 
   return SUCCESS;
+}
+
+void cleanup_module(void) {
+  unregister_chrdev(major,DEVICE_NAME);
+}
+
+static int device_open( struct inode *inode, struct file *file ) {
+  static int counter = 0;
+  if (device_open_count)
+    return -EBUSY;
+
+  device_open_count++;
+  sprintf(msg, "%d\n", counter++);
+  msg_ptr = msg;
+
+  return SUCCESS;
+}
+
+static int device_release(struct inode *inode, struct file *file) {
+  device_open_count--;
+  module_put(THIS_MODULE);
+
+  return SUCCESS;
+}
+
+static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t *offset) {
+  int bytes_read = 0;
+  if (*msg_ptr == 0)
+    return 0;
+
+  while (length && *msg_ptr) {
+    put_user(*(msg_ptr++), buffer++);
+    length--;
+    bytes_read++;
+  }
+
+  return bytes_read;
+}
+
+static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t *off) {
+  printk(KERN_ALERT "not supported\n");
+  return -EINVAL;
 }
