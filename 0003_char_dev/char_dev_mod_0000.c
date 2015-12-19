@@ -53,6 +53,7 @@ static int device_open( struct inode *inode, struct file *file ) {
   device_open_count++;
   sprintf(msg, "%d\n", counter++);
   msg_ptr = msg;
+  try_module_get(THIS_MODULE);
 
   return SUCCESS;
 }
