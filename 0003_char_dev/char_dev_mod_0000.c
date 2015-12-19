@@ -10,6 +10,9 @@ static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
 
+MODULE_LICENSE("GPL");
+MODULE_DESCRIPTION("Testing character device modules");
+
 #define SUCCESS     0
 #define DEVICE_NAME "chardev"
 #define BUF_LEN     80
@@ -31,12 +34,12 @@ int init_module(void) {
   major = register_chrdev(0, DEVICE_NAME, &fops);
 
   if ( major < 0 ) {
-    printk( KERN_ALERT "registering failed: %d\n", major );
+    printk( KERN_ALERT "%s: registering failed: %d\n", DEVICE_NAME, major );
     return major;
   }
 
-  printk( KERN_INFO "Major Number: %d\n", major );
-  printk( KERN_INFO "mknod /dev/%s c %d 0\n", DEVICE_NAME, major );
+  printk(KERN_INFO "%s: major number=%d\n", DEVICE_NAME, major);
+  printk(KERN_INFO "%s: run 'mknod /dev/%s c %d 0'\n",DEVICE_NAME, DEVICE_NAME, major);
 
   return SUCCESS;
 }
@@ -67,6 +70,7 @@ static int device_release(struct inode *inode, struct file *file) {
 
 static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t *offset) {
   int bytes_read = 0;
+  printk(KERN_INFO "%s: size_t length: %d\n", DEVICE_NAME, length);
   if (*msg_ptr == 0)
     return 0;
 
@@ -80,6 +84,6 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_
 }
 
 static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t *off) {
-  printk(KERN_ALERT "not supported\n");
-  return -EINVAL;
+  printk(KERN_INFO "%s: (buff=%s) (len=%d)\n", DEVICE_NAME, buff, len); 
+  return len;
 }
