@@ -23,6 +23,9 @@ static int device_open_count = 0;
 static char msg[BUF_LEN];
 static char *msg_ptr;
 
+static char write_msg[BUF_LEN];
+static char *write_ptr;
+
 static struct file_operations fops = {
   .read    = device_read,
   .write   = device_write,
@@ -84,6 +87,15 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_
 }
 
 static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t *off) {
+  int bytes_written = 0;
   printk(KERN_INFO "%s: (buff=%s) (len=%d)\n", DEVICE_NAME, buff, len); 
-  return len;
+  write_ptr = write_msg;
+  while ( len ) {
+    get_user( *(write_ptr++), buff++ );
+    len--;
+    bytes_written++;
+  }
+  *write_ptr = 0;
+  printk(KERN_INFO "%s: read from user %s\n", DEVICE_NAME, write_msg);
+  return bytes_written;
 }
