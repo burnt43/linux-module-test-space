@@ -9,6 +9,7 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
+void debug_inode(struct inode *);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Testing character device modules");
@@ -51,8 +52,45 @@ void cleanup_module(void) {
   unregister_chrdev(major,DEVICE_NAME);
 }
 
+void debug_inode(struct inode *inode) {
+  umode_t tmp_umode_result = 0; 
+  char *tmp_message;
+
+  printk(KERN_INFO "%s: --------------------------INODE DEBUG----------------------------\n", DEVICE_NAME);
+  printk(KERN_INFO "%s: \033[0;31minode->i_mode\033[0;39m(umode_t): %d\n", DEVICE_NAME, inode->i_mode);
+  tmp_umode_result = S_IFMT & inode->i_mode;
+  switch ( tmp_umode_result ) {
+    case S_IFSOCK:
+      tmp_message = "S_IFSOCK";
+      break;
+    case S_IFLNK:
+      tmp_message = "S_IFLNK";
+      break;
+    case S_IFREG:
+      tmp_message = "S_IFREG";
+      break;
+    case S_IFBLK:
+      tmp_message = "S_IFBLK";
+      break;
+    case S_IFDIR:
+      tmp_message = "S_IFDIR";
+      break;
+    case S_IFCHR:
+      tmp_message = "S_IFCHR";
+      break;
+    case S_IFIFO:
+      tmp_message = "S_IFIFO";
+      break;
+    default:
+      tmp_message = "unknown";
+  }
+  printk(KERN_INFO "%s: %d & %d (S_IFMT & inode->i_mode) = %d(%s)", DEVICE_NAME, S_IFMT, inode->i_mode, tmp_umode_result, tmp_message);
+  printk(KERN_INFO "%s: -----------------------------------------------------------------\n", DEVICE_NAME);
+}
+
 static int device_open( struct inode *inode, struct file *file ) {
   static int counter = 0;
+  debug_inode(inode);
   if (device_open_count)
     return -EBUSY;
 
