@@ -54,7 +54,7 @@ void cleanup_module(void) {
 }
 
 void print_flag_data(const char *flag_name, unsigned long flag_value, const char *bits_name, unsigned long bits_value) {
-  printk(KERN_INFO "%s: %5lu & %lu (\033[0;35m%s\033[0;39m & %s) = %s\n", DEVICE_NAME, flag_value, bits_value, flag_name, bits_name, (flag_value & bits_value) > 0 ? "\033[0;32m1\033[0;39m" : "\033[0;31m0\033[0;39m");
+  printk(KERN_INFO "%s: %5lu & %lu \033[0;35m%20s\033[0;39m & %-20s = %s\n", DEVICE_NAME, flag_value, bits_value, flag_name, bits_name, (flag_value & bits_value) > 0 ? "\033[0;32m1\033[0;39m" : "\033[0;31m0\033[0;39m");
 }
 
 #define I_MODE_LENGTH 12
