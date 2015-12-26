@@ -59,6 +59,7 @@ void print_flag_data(const char *flag_name, unsigned long flag_value, const char
 
 #define I_MODE_LENGTH 12
 #define I_OPFLAG_LENGTH 3
+#define I_FLAG_LENGTH 14
 void debug_inode(struct inode *inode) {
   umode_t tmp_umode_result = 0; 
   char *tmp_message;
@@ -67,6 +68,9 @@ void debug_inode(struct inode *inode) {
 
   static char* i_opflag_names[I_OPFLAG_LENGTH]           = {"IOP_FASTPERM", "IOP_LOOKUP", "IOP_NOFOLLOW"};
   static unsigned short i_opflag_values[I_OPFLAG_LENGTH] = {IOP_FASTPERM, IOP_LOOKUP, IOP_NOFOLLOW};
+
+  static char* i_flag_names[I_FLAG_LENGTH]         = {"S_SYNC", "S_NOATIME", "S_APPEND", "S_IMMUTABLE", "S_DEAD", "S_NOQUOTA", "S_DIRSYNC", "S_NOCMTIME", "S_SWAPFILE", "S_PRIVATE", "S_IMA", "S_AUTOMOUNT", "S_NOSEC", "S_DAX"};
+  static unsigned int i_flag_values[I_FLAG_LENGTH] = {S_SYNC, S_NOATIME, S_APPEND, S_IMMUTABLE, S_DEAD, S_NOQUOTA, S_DIRSYNC, S_NOCMTIME, S_SWAPFILE, S_PRIVATE, S_IMA, S_AUTOMOUNT, S_NOSEC, S_DAX};
   int index = 0;
 
   printk(KERN_INFO "%s: --------------------------INODE DEBUG----------------------------\n", DEVICE_NAME);
@@ -111,6 +115,11 @@ void debug_inode(struct inode *inode) {
   printk(KERN_INFO "%s: \033[0;31minode->i_uid.val\033[0;39m(uid_t) : %u\n", DEVICE_NAME, inode->i_uid.val);
   // kgid_t i_gid : Group ID
   printk(KERN_INFO "%s: \033[0;31minode->i_gid.val\033[0;39m(gid_t) : %u\n", DEVICE_NAME, inode->i_gid.val);
+  // unsigned int i_flags : not sure what this stuff means
+  printk(KERN_INFO "%s: \033[0;31minode->i_flags\033[0;39m(unsigned int): %u\n", DEVICE_NAME, inode->i_flags);
+  for (index=0; index < I_FLAG_LENGTH; index++) {
+    print_flag_data(i_flag_names[index], i_flag_values[index], "i_flags", inode->i_flags);
+  }
   printk(KERN_INFO "%s: -----------------------------------------------------------------\n", DEVICE_NAME);
 }
 
