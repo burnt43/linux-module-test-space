@@ -107,6 +107,10 @@ void debug_inode(struct inode *inode) {
   for (index=0; index < I_OPFLAG_LENGTH; index++) {
     print_flag_data(i_opflag_names[index], i_opflag_values[index], "i_opflags", inode->i_opflags);
   }
+  // kuid_t i_uid : User ID
+  printk(KERN_INFO "%s: \033[0;31minode->i_uid.val\033[0;39m(uid_t) : %u\n", DEVICE_NAME, inode->i_uid.val);
+  // kgid_t i_gid : Group ID
+  printk(KERN_INFO "%s: \033[0;31minode->i_gid.val\033[0;39m(gid_t) : %u\n", DEVICE_NAME, inode->i_gid.val);
   printk(KERN_INFO "%s: -----------------------------------------------------------------\n", DEVICE_NAME);
 }
 
